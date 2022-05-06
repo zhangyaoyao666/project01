@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/bootstrap.css"/>
+    <script src="./js/jquery-3.6.0.js"></script>
+</head>
+<body style="padding:15px">  
+    <div class="panel panel-primary">
+          <div class="panel-heading">
+                <h3 class="panel-title">添加新图书</h3>
+          </div>
+          <div class="panel-body form-inline">               
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default">书名</button>
+                    </span>
+                    <input type="text" class="form-control" id="exampleInputAmount" placeholder="请输入书名">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default">作者</button>
+                    </span>
+                    <input type="text" class="form-control" id="exampleInputAmount" placeholder="请输入作者">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default">出版社</button>
+                    </span>
+                    <input type="text" class="form-control" id="exampleInputAmount" placeholder="请输入出版社">
+                </div> 
+                <button id="btnAdd" class="btn btn-primary">添加</button>               
+          </div>
+    </div>
+   
+   <table class="table table-hover">
+       <thead>
+           <tr>
+               <th>ID</th>
+               <th>书名</th>
+               <th>作者</th>
+               <th>出版社</th>
+               <th>操作</th>
+           </tr>
+       </thead>
+       <tbody id='bookBody'>
+           <tr>
+               <td></td>
+           </tr>
+       </tbody>
+   </table>
+    
+    <script>
+        $(function(){
+            function getBookList(){
+                //1.发起ajax请求
+                $.get('http://www.liulongbin.top:3006/api/getbooks', 
+                function(res){
+                    if(res.status !== 200) return alert('获取图书列表失败！')
+                    //3.渲染页面结构
+                    var rows = []
+                    $.each(res.data, function(i, item){
+                        //循环拼接字符串
+                        rows.push('<tr><td>' + item.id + '</td><td>' + item.bookname + 
+                            '</td><td>' + item.author +'</td><td>' + item.publisher + 
+                            '</td><td><a href="javascript:;"  class="del" data-id ="'+item.id+'"> 删除</a></td></tr>')
+                    })
+                    //5.渲染表格结构
+                    $('#bookBody').empty().append(rows.join(''))
+                })
+            }
+            getBookList()
+            //代理方式，为动态添加元素绑定点击事件
+            $('tbody').on('click', '.del', function(){
+                var id = $(this).attr('data-id')
+                console.log(id);
+                $.get('http://www.liulongbin.top:3006/api/delbook',{id:id},
+                function(res){
+                    if(res.status !== 200) return alert('删除图书失败！')
+                })
+                getBookList()
+            })
+        })
+    </script>   
+</body>
+</html>
